@@ -1,0 +1,8 @@
+# TeX misc files
+*.aux
+*.toc
+*.out
+*.log
+*.nav
+*.snm
+_minted-report
