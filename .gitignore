@@ -5,4 +5,11 @@
 *.log
 *.nav
 *.snm
+*.vrb
+*.fdb_latexmk
+*.fls
+
 _minted-report
+_minted-presentationo
+_minted-main
+
