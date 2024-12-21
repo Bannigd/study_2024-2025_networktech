@@ -1,0 +1,128 @@
+\input{preamble.tex}
+
+\title{Лабораторная работа № 4. \\ Подготовка экспериментального стенда GNS3}
+\author{Данила Стариков \\ НПИбд-02-22}
+\institute{Российский университет дружбы народов имени Патриса Лумумбы}
+\date{2024}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Цель работы}
+\begin{itemize}
+    \item Установка и настройка GNS3 и сопутствующего программного обеспечения.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+\frametitle{Установка GNS3-all-in-one}
+        \begin{minted}{bash}
+    sudo dnf install gns3-gui gns3-server
+        \end{minted}
+        \vfill
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image01.png}
+    \captionof{figure}{Установка необходимых пакетов.}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Установка GNS3 VM для VirtualBox}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image02.png}
+    \captionof{figure}{GNS3 VM в VirtualBox.}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Установка GNS3 VM для VirtualBox}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image03.png}
+    \captionof{figure}{Параметры образа виртуальной машины.}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Установка GNS3 VM для VirtualBox}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image04.png}
+    \captionof{figure}{Меню настроек сетевых адаптеров в VirtualBox.}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Установка GNS3 VM для VirtualBox}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image05.png}
+    \captionof{figure}{Выбор созданного адаптера в настройках образа.}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Запуск экземпляра GNS3 в VirtualBox}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image06.png}
+    \captionof{figure}{Интерфейс GNS3 VM.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Запуск экземпляра GNS3 в VirtualBox}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image07.png}
+    \captionof{figure}{Интерфейс приложения GNS3.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Добавление образа маршрутизатора FRR}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image09.png}
+    \captionof{figure}{Меню создания нового маршрутизатора.}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Добавление образа маршрутизатора FRR}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image10.png}
+    \captionof{figure}{Список доступных маршрутизаторов.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Добавление образа маршрутизатора FRR}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image11.png}
+    \captionof{figure}{Выбор версии установки FRR.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Добавление образа маршрутизатора FRR}
+    \centering
+    \includegraphics[width=0.6\textwidth]{../images/image12.png}
+    \captionof{figure}{Конфигурация маршрутизатора FRR.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Добавление образа маршрутизатора VyOS}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image13.png}
+    \captionof{figure}{Выбор установочного файла VyOS.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Добавление образа маршрутизатора VyOS}
+    \centering
+    \includegraphics[width=0.6\textwidth]{../images/image14.png}
+    \captionof{figure}{Конфигурация маршрутизатора VyOS.}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+    \item В результате выполнения лабораторной работы установили и настроили GNS3 и сопутствующее программное обеспечение для дальнейшей работы.
+\end{itemize}
+\end{frame}
+\end{document}

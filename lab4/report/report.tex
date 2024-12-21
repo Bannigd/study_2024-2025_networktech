@@ -1,0 +1,174 @@
+\input{preamble.tex}
+
+\title{Отчет по лабораторной работе № 4. \\ Подготовка экспериментального стенда GNS3}
+\author{Данила Стариков \\ НПИбд-02-22}
+\date{2024}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\tableofcontents
+
+\newpage
+\section{Цель работы}
+Установка и настройка GNS3 и сопутствующего программного обеспечения.
+\newpage
+\section{Выполнение работы}
+\subsection{Установка GNS3}
+\subsubsection{Установка GNS3-all-in-one}
+\begin{enumerate}
+    \item Через пакетный менеджер установили необходимые пакеты для GNS (Рис. \ref{01}):
+        \begin{minted}{bash}
+    sudo dnf install gns3-gui gns3-server
+        \end{minted}
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image01.png}
+    \captionof{figure}{Установка необходимых пакетов.}
+    \label{01}
+\end{center}
+
+\end{enumerate}
+\subsubsection{Установка GNS3 VM для VirtualBox}
+\begin{enumerate}
+    \item Далее установили версию виртуальной машины GNS3 VM для VirtualBox с официального репозитория \url{https://github.com/gns3/gns3-gui/releases}, обратив внимание на необходимость совместимости версий. В работе используются версия GNS3 2.2.50:
+        \begin{minted}[breaklines,breakbefore=//]{bash}
+wget https://github.com/GNS3/gns3-gui/releases/download/v2.2.50/GNS3.VM.VirtualBox.2.2.50.zip
+unzip GNS3.VM.VirtualBox.2.2.50.zip
+        \end{minted}
+    \item Запустили VirtualBox. Выбрали меню {\tt Файл} {\tt Импорт конфигураций...}. Указали месторасположение распакованного образа GNS3 VM.ova. В следующем окне в параметрах импорта выбрали в политике MAC-адреса "Сгенерировать новые MAC-адреса всех сетевых адаптеров". Нажали {\tt Импорт} (Рис. \ref{02}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image02.png}
+    \captionof{figure}{GNS3 VM в VirtualBox.}
+    \label{02}
+\end{center}
+
+    \item Настроили вложенную виртуализацию в VirtualBox через консоль:
+        \begin{minted}{bash}
+    vboxmanage modifyvm "GNS3 VM" --nested-hw-virt on
+        \end{minted}
+
+        Убедились, что опция теперь включена в графическом интерфейсе (Рис. \ref{03}):
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image03.png}
+    \captionof{figure}{Параметры образа виртуальной машины.}
+    \label{03}
+\end{center}
+
+    \item Настроили сетевой адаптер. Для этого перешли в {\tt Инструменты}, {\tt Сеть} и {\tt Создать} (Рис. \ref{04}).
+        В списке появился новый адаптер {\tt vboxnet0}, который затем выбрали в настройки GNS3 VM (Рис. \ref{05}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image04.png}
+    \captionof{figure}{Меню настроек графических адаптеров в VirtualBox.}
+    \label{04}
+\end{center}
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image05.png}
+    \captionof{figure}{Выбор созданного адаптера в настройках образа.}
+    \label{05}
+\end{center}
+
+
+\end{enumerate}
+\subsubsection{Запуск экземпляра GNS3 в VirtualBox}
+\begin{enumerate}
+    \item Запустили виртуальную машину GNS3 VM  (Рис. \ref{06}), затем запустили в операционной системе приложение gns3 (Рис. \ref{07}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image06.png}
+    \captionof{figure}{Интерфейс GNS3 VM.}
+    \label{06}
+\end{center}
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image07.png}
+    \captionof{figure}{Интерфейс приложения GNS3.}
+    \label{07}
+\end{center}
+
+\end{enumerate}
+\subsection{Подключение образа оборудования в GNS3}
+\subsubsection{Добавление образа маршрутизатора FRR}
+\begin{enumerate}
+    \item Запустили GNS3 VM, и затем gns3.
+    \item В рабочем пространстве GNS3 на левой боковой панели выбрали просмотр маршрутизаторов (Browse Routers), затем нажали на {\tt + New template} (Рис. \ref{09}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image09.png}
+    \captionof{figure}{Меню создания нового маршрутизатора.}
+    \label{09}
+\end{center}
+
+\item В следующем окне выбрали Routers и образ FRR (FRRouting), нажали Install (Рис. \ref{10}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image10.png}
+    \captionof{figure}{Список доступных маршрутизаторов.}
+    \label{10}
+\end{center}
+
+\item В окне с выбором версии для установки выбрали самую актуальную и запустили загрузку (Рис. \ref{11}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image11.png}
+    \captionof{figure}{Выбор версии установки FRR.}
+    \label{11}
+\end{center}
+
+\item После установки открыли настройки маршрутизатора и во вкладке General Settings выбрали {\tt Send the shutdown signal (ACPI)}. Во вкладке "HDD" поставили галочку {\tt Automatically create a config disk on HDD} (Рис. \ref{12}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image12.png}
+    \captionof{figure}{Конфигурация маршрутизатора FRR.}
+    \label{12}
+\end{center}
+
+\end{enumerate}
+\subsubsection{Добавление образа маршрутизатора VyOS}
+\begin{enumerate}
+    \item Для добавления маршрутизатора VyOS предварительно скачали файл образа с репозитория \url{https://github.com/yamadharma/dyos-build/releases}:
+        \begin{minted}[breakbefore=//]{bash}
+wget https://github.com/yamadharma/dyos-build/releases/download/v1.3.3/vyos-edu.gns3a
+wget https://github.com/yamadharma/dyos-build/releases/download/v1.3.3/vyos-1.3.3-amd64.qcow2
+        \end{minted}
+    \item Скачанный файл добавили в GNS3 через меню {\tt File}, {\tt import appliance} и далее прошли через аналогичные шаги установки маршрутизатора (Рис. \ref{13}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image13.png}
+    \captionof{figure}{Выбор установочного файла VyOS.}
+    \label{13}
+\end{center}
+
+    \item После установки также в настройках во вкладке General Settings выбрали {\tt Send the shutdown signal (ACPI)}. Во вкладке "HDD" поставили галочку {\tt Automatically create a config disk on HDD} (Рис. \ref{14}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image14.png}
+    \captionof{figure}{Конфигурация маршрутизатора VyOS.}
+    \label{14}
+\end{center}
+
+\end{enumerate}
+
+\section{Выводы}
+В результате выполнения лабораторной работы установили и настроили GNS3 и сопутствующее программное обеспечение для дальнейшей работы.
+
+\end{document}
