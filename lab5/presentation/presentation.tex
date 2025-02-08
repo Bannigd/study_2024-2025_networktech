@@ -1,0 +1,147 @@
+\input{preamble.tex}
+
+\title{Лабораторная работа № 5. \\ Простые сети в GNS3. Анализ трафика}
+\author{Данила Стариков \\ НПИбд-02-22}
+\institute{Российский университет дружбы народов имени Патриса Лумумбы}
+\date{2024}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Цель работы}
+\begin{itemize}
+    \item Построение простейших моделей сети на базе коммутатора и маршрутизаторов FRR и VyOS в GNS3, анализ трафика посредством Wireshark.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе коммутатора в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image01.png}
+    \captionof{figure}{Топология сети.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе коммутатора в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image02.png}
+    \captionof{figure}{Задание IP-адреса для PC-1.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе коммутатора в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image03.png}
+    \captionof{figure}{Задание IP-адреса для PC-2.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе коммутатора в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image04.png}
+    \captionof{figure}{Отправка эхо-запроса от PC-1 к PC-2.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе коммутатора в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image05.png}
+    \captionof{figure}{Отправка эхо-запроса от PC-2 к PC-1.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Анализ трафика в GNS3 посредством Wireshark}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image06.png}
+    \captionof{figure}{Просмотр перехваченных пакетов по протоколу ARP.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Анализ трафика в GNS3 посредством Wireshark}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image07.png}
+    \captionof{figure}{Перехваченный пакет эхо-запроса в ICMP-моде.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Анализ трафика в GNS3 посредством Wireshark}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image08.png}
+    \captionof{figure}{Отправка эхо-запроса в UDP-моде.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Анализ трафика в GNS3 посредством Wireshark}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image09.png}
+    \captionof{figure}{Перехваченный пакет эхо-запроса в UDP-моде.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Анализ трафика в GNS3 посредством Wireshark}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image10.png}
+    \captionof{figure}{Отправка эхо-запроса в TCP-моде.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Анализ трафика в GNS3 посредством Wireshark}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image11.png}
+    \captionof{figure}{Перехваченный пакет эхо-запроса в TCP-моде.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе маршрутизатора VyOS в GNS3}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image12.png}
+    \captionof{figure}{Задание IP-адреса для PC-1.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе маршрутизатора VyOS в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image14.png}
+    \captionof{figure}{Изменение имени устройства.}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image15.png}
+    \captionof{figure}{Задание IP-адреса на интерфейсе eth0.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе маршрутизатора VyOS в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image17.png}
+    \captionof{figure}{Сохранение изменений.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе маршрутизатора VyOS в GNS3}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../images/image16.png}
+    \captionof{figure}{Просмотр информации об интерфейсах маршрутизатора.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе маршрутизатора VyOS в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image18.png}
+    \captionof{figure}{Отправка эхо-запроса от PC1 к маршрутизатору.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Моделирование простейшей сети на базе маршрутизатора VyOS в GNS3}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image19.png}
+    \captionof{figure}{Просмотр перехваченных пакетов.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+    \item В результате выполнения лабораторной работы построили простейшие модели сети на базе коммутатора и маршрутизатора VyOS в GNS3 и провели анализ трафика посредством Wireshark.
+\end{itemize}
+\end{frame}
+\end{document}

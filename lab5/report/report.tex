@@ -1,0 +1,272 @@
+\input{preamble.tex}
+\title{Отчет по лабораторной работе № 5. \\ Простые сети в GNS3. Анализ трафика}
+\author{Данила Стариков \\ НПИбд-02-22}
+\date{2024}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\tableofcontents
+
+\newpage
+\section{Цель работы}
+Построение простейших моделей сети на базе коммутатора и маршрутизаторов FRR и VyOS в GNS3, анализ трафика посредством Wireshark.
+
+\newpage
+\section{Выполнение работы}
+\subsection{Моделирование простейшей сети на базе коммутатора в GNS3}
+\begin{enumerate}
+\item Запустили GNS3 VM и GNS3. Создали новый проект.
+\item В рабочей области GNS3 разместили коммутатор Ethernet и два VPCS (рис. \ref{01}). Изменили название устройства, включив в имя устройства имя учётной записи. Коммутатору присвоили название \texttt{msk-dastarikov-sw-01}. Соединили VPCS с коммутатором. Отобразили обозначение интерфейсов соединения.
+
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image01.png}
+    \captionof{figure}{Топология сети.}
+    \label{01}
+\end{center}
+
+
+\item Задали IP-адреса VPCS. Для этого с помощью меню, вызываемого правой кнопкой мыши, запустили Start, например, PC-1, затем вызвали его терминал Console. Для просмотра синтаксиса возможных для ввода команд набрали {\tt /?}.
+Для задания IP-адреса 192.168.1.11 в сети 192.168.1.0/24 ввели (рис. \ref{02}):
+\begin{minted}{bash}
+ip 192.168.1.11/24 192.168.1.1
+\end{minted}
+
+\item  Аналогичным образом задали IP-адрес 192.168.1.12 для PC-2 (рис. \ref{03}):
+
+\begin{minted}{bash}
+ip 192.168.1.12/24 192.168.1.1
+\end{minted}
+
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image02.png}
+    \captionof{figure}{Задание IP-адреса для PC-1.}
+    \label{02}
+\end{center}
+
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image03.png}
+    \captionof{figure}{Задание IP-адреса для PC-2.}
+    \label{03}
+\end{center}
+
+
+\item Проверили работоспособность соединения между PC-1 и PC-2 с помощью
+команды \texttt{ping} (рис. \ref{04} и \ref{05}).
+
+  \begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image04.png}
+    \captionof{figure}{Отправка эхо-запроса от PC-1 к PC-2.}
+    \label{04}
+\end{center}
+
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image05.png}
+    \captionof{figure}{Отправка эхо-запроса от PC-2 к PC-1.}
+    \label{05}
+\end{center}
+
+
+\item Остановили в проекте все узлы (меню GNS3 \texttt{Control} \(\rightarrow\) \texttt{Stop all nodes}).
+\end{enumerate}
+
+\subsection{Анализ трафика в GNS3 посредством Wireshark}
+\begin{enumerate}
+\item Запустили на соединении между PC-1 и коммутатором анализатор трафика. Для этого щёлкнули правой кнопкой мыши на соединении, выбрали в меню \texttt{Start capture}. % при необходимости можете скорректировать название DUMP-файла
+Запустился Wireshark, а в проекте GNS3 на соединении появится значок лупы.
+\item В проекте GNS3 стартовали все узлы (меню GNS3 \texttt{Control} \(\rightarrow\) \texttt{xStart/Resume all nodes}). В окне Wireshark отобразилась информация по протоколу ARP (рис. \ref{06}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image06.png}
+    \captionof{figure}{Просмотр перехваченных пакетов по протоколу ARP.}
+    \label{06}
+\end{center}
+
+Оба устройства отправляют ARP-запросы для определения MAC-адресов устройств, чей IP-адрес им уже известен.
+
+\item В терминале PC-2 посмотрели информацию по опциям команды \texttt{ping}, введя \texttt{ping /?}. Затем сделали один эхо-запрос в ICMP-моде к узлу PC-1 (рис. \ref{07}).
+  
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image07.png}
+    \captionof{figure}{Перехваченный пакет эхо-запроса в ICMP-моде.}
+    \label{07}
+\end{center}
+
+
+
+  % В окне Wireshark проанализируйте полученную информацию, дайте пояснения в отчёте.
+\item Сделали один эхо-запрос в UDP-моде к узлу PC-1 (рис. \ref{08} и \ref{09}).
+    
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image08.png}
+    \captionof{figure}{Отправка эхо-запроса в UDP-моде.}
+    \label{08}
+\end{center}
+
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image09.png}
+    \captionof{figure}{Перехваченный пакет эхо-запроса в UDP-моде.}
+    \label{09}
+\end{center}
+
+\item Сделали один эхо-запрос в TCP-моде к узлу PC-1 (рис. \ref{10} и \ref{11}).
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image10.png}
+    \captionof{figure}{Отправка эхо-запроса в TCP-моде.}
+    \label{10}
+\end{center}
+
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image11.png}
+    \captionof{figure}{Перехваченный пакет эхо-запроса в TCP-моде.}
+    \label{11}
+\end{center}
+
+Для отправки TCP-пакета сначала выполняется процедура трехстороннего рукопожатия (\texttt{TCP handshake}), которое подробнее разбиралось в лабораторной работе №3. После установления соединения отправляется сам эхо-запрос.
+
+\item Остановили захват пакетов в Wireshark.
+\end{enumerate}
+
+\subsection{Моделирование простейшей сети на базе маршрутизатора VyOS в GNS3}
+\begin{enumerate}
+\item Запустили GNS3 VM и GNS3. Создали новый проект.
+\item В рабочей области GNS3 разместили VPCS, коммутатор Ethernet и маршрутизатор VyOS (рис. \ref{21}).
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image21.png}
+    \captionof{figure}{Топология сети.}
+    \label{21}
+\end{center}
+
+\item Изменили отображаемые названия устройств. Коммутатору присвоили название по принципу \texttt{msk-dastarikov-sw-0x}, маршрутизатору — по принципу \texttt{msk-dastarikov-gw-0x}, VPCS — по принципу \texttt{PCx-dastarikov}, вместо x — порядковый номер устройства.
+\item Включили захват трафика на соединении между коммутатором и маршрутизатором.
+\item Запустили все устройства проекта. Открыли консоль всех устройств проекта.
+\item Настроили IP-адресацию для интерфейса узла PC1 (рис. \ref{12}):
+  \begin{minted}{bash}
+    ip 192.168.1.10/24 192.168.1.1
+    save
+    show ip
+  \end{minted}
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image12.png}
+    \captionof{figure}{Задание IP-адреса для PC-1.}
+    \label{12}
+\end{center}
+
+
+\item Настроили маршрутизатор VyOS (рис. \ref{14}-\ref{16}):
+    \begin{enumerate}
+\item После загрузки ввели логин vyos и пароль vyos:
+  \begin{minted}{bash}
+    vyos login: vyos
+    Password:
+  \end{minted}
+
+\item Перешли в режим конфигурирования:
+  \begin{minted}{bash}
+    vyos@vyos$ configure
+    vyos@vyos#
+  \end{minted}
+
+\item Изменили имя устройства (вместо dastarikov укажите свою учётную запись):
+  \begin{minted}{bash}
+    vyos@vyos#set system host-name msk-dastarikov-gw-01
+  \end{minted}
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image14.png}
+    \captionof{figure}{Изменение имени устройства.}
+    \label{14}
+\end{center}
+
+\item Задали IP-адрес на интерфейсе eth0:
+  \begin{minted}{bash}
+    vyos@vyos# set interfaces ethernet eth0 address 192.168.1.1/24
+  \end{minted}
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image15.png}
+    \captionof{figure}{Задание IP-адреса на интерфейсе eth0.}
+    \label{15}
+\end{center}
+
+
+\item Посмотрели внесённые в конфигурацию изменения:
+  \begin{minted}{bash}
+    vyos@vyos# compare
+  \end{minted}
+\item Применили изменения в конфигурации и сохранили саму конфигурацию:
+  \begin{minted}{bash}
+    vyos@vyos# commit
+    vyos@vyos# save
+  \end{minted}
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image17.png}
+    \captionof{figure}{Сохранение изменений.}
+    \label{17}
+\end{center}
+
+
+\item Посмотрили информацию об интерфейсах маршрутизатора:
+  \begin{minted}{bash}
+    vyos@vyos# show interfaces
+  \end{minted}
+  
+  \begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image16.png}
+    \captionof{figure}{Просмотр информации об интерфейсах маршрутизатора.}
+    \label{16}
+  \end{center}
+
+\item Вышли из режима конфигурирования:
+  \begin{minted}{bash}
+    vyos@vyos# exit
+    vyos@vyos$
+  \end{minted}
+    \end{enumerate}
+\item Проверили подключение. Узел PC1 должен успешно отправлять эхо-запросы на адрес маршрутизатора 192.168.1.1  (рис. \ref{18} и \ref{19}).
+
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image18.png}
+    \captionof{figure}{Отправка эхо-запроса от PC1 к маршрутизатору.}
+    \label{18}
+\end{center}
+  
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{../images/image19.png}
+    \captionof{figure}{Просмотр перехваченных пакетов.}
+    \label{19}
+\end{center}
+
+\item Остановили захват пакетов в Wireshark. Остановили все устройства в проекте. Завершили работу с GNS3.
+\end{enumerate}
+
+\section{Выводы}
+В результате выполнения лабораторной работы построили простейшие модели сети на базе коммутатора и маршрутизатора VyOS в GNS3 и провели анализ трафика посредством Wireshark.
+\end{document}
