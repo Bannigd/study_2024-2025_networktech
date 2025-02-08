@@ -1,0 +1,340 @@
+\input{preamble.tex}
+
+\title{Лабораторная работа № 7. \\ Адресация IPv4 и IPv6. Настройка DHCP}
+\author{Данила Стариков \\ НПИбд-02-22}
+\institute{Российский университет дружбы народов имени Патриса Лумумбы}
+\date{2024}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Цель работы}
+\begin{itemize}
+    \item Получение навыков настройки службы DHCP на сетевом оборудовании для распределения адресов IPv4 и IPv6
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image01.png}
+  \captionof{figure}{Топология моделируемой сети.}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{table}[h]
+  \centering
+  \caption{Таблица адресации.}
+  \label{tbl1}
+\footnotesize
+  \begin{tabular}{|p{1.5cm}|p{1.5cm}|p{1.4cm}|p{1.4cm}|p{1.7cm}|p{1.5cm}|}
+    \hline
+    Устройство & Интерфейс & IPv4-адрес               & Длина префикса & Шлюз по умолчанию & DNS             \\ \hline
+    gw-01      & eth0      & 10.0.0.1                 & 24             & -                 & -               \\ \hline
+    PC1        & NIC       & Назначен протоколом DHCP & 24 (DHCP)      & 10.0.0.1 (DHCP)   & 10.0.0.1 (DHCP) \\ \hline
+  \end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image02.png}
+  \captionof{figure}{Настройка маршрутизатора.}
+  \label{02}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image03.png}
+  \captionof{figure}{Настройка маршрутизатора.}
+  \label{03}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Настройка DHCP в случае IPv4}
+  \begin{minted}[fontsize=\footnotesize]{bash}
+    dastarikov@dastarikov-gw-01# set interfaces ethernet eth0 address 10.0.0.1/24
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov domain-name dastarikov.net
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov name-server 10.0.0.1
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov subnet 10.0.0.0/24 default-router 10.0.0.1
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov subnet 10.0.0.0/24 range hosts start 10.0.0.2
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov subnet 10.0.0.0/24 range hosts stop 10.0.0.253
+    dastarikov@dastarikov-gw-01# commit
+    dastarikov@dastarikov-gw-01# save
+    dastarikov@dastarikov-gw-01# exit
+  \end{minted}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image04.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{04}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image30.png}
+  \captionof{figure}{Настройка DHCP на PC1.}
+  \label{30}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image31.png}
+  \captionof{figure}{Настройка DHCP на PC1.}
+  \label{31}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image05.png}
+  \captionof{figure}{Проверка IP-адреса на PC1.}
+  \label{05}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image06.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{06}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image07.png}
+  \captionof{figure}{Просмотр логов работы DHCP-сервера.}
+  \label{07}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv4}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image08.png}
+  \captionof{figure}{Просмотр перехваченных пакетов.}
+  \label{08}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image29.png}
+  \captionof{figure}{Топология моделируемой сети.}
+  \label{img:topology2}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{table}[]
+\centering
+\caption{Таблица адресации}
+\label{tab2}
+\tiny
+\begin{tabular}{|l|l|p{2cm}|p{1.5cm}|p{2cm}|p{1cm}|}
+\hline
+Устройство & Интерфейс & IPv4-адрес                          & Длина префикса & Шлюз по умолчанию         & DNS              \\ \hline
+gw-01      & eth1      & 2000::1                             & 64             & —                         & —                \\ \hline
+gw-01      & eth2      & 2001::1                             & 64             & —                         & —                \\ \hline
+PC2        & NIC       & Назначен протоколом SLAAC           & 64 (SLAAC)     & Назначен протоколом SLAAC &                  \\ \hline
+PC2        & NIC       & Назначен протоколами SLAAC и DHCPv6 & 64             & Назначен маршрутизатором  & 2000::1 (DHCPv6) \\ \hline
+PC3        & NIC       & Назначен протоколом DHCPv6          & 64             & Назначен маршрутизатором  & 2001::1 (DHCPv6) \\ \hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image09.png}
+  \captionof{figure}{Настройка IPv6-адресов на маршрутизаторе.}
+  \label{09}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Настройка DHCP в случае IPv6}
+    \begin{minted}[fontsize=\footnotesize]{bash}
+      dastarikov@dastarikov-gw-01# set service router-advert interface eth1 prefix 2000::/64
+      dastarikov@dastarikov-gw-01# set service router-advert interface eth1 other-config-flag
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateless
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateless subnet 2000::0/64
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateless common-options name-server 2000::1
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateless common-options domain-search dastarikov.net
+      dastarikov@dastarikov-gw-01# commit
+      dastarikov@dastarikov-gw-01# save
+      dastarikov@dastarikov-gw-01# run show configuration
+    \end{minted}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image10.png}
+  \captionof{figure}{Проверка настроек сети узла PC2.}
+  \label{10}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image12.png}
+  \captionof{figure}{Проверка подключения к маршрутизатору PC2.}
+  \label{12}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image13.png}
+  \captionof{figure}{Проверка настроек DNS и DHCPv6 узла PC2.}
+  \label{13}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image14.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{14}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+ \includegraphics[width=0.8\textwidth]{../images/image28.png}
+  \captionof{figure}{Перехваченный DHCPv6 пакет.}
+  \label{28}
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Настройка DHCP в случае IPv6}
+    \begin{minted}[fontsize=\footnotesize]{bash}
+      dastarikov@dastarikov-gw-01# set service router-advert interface eth2 managed-flag
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful subnet 2001::0/64
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful subnet 2001::0/64 name-server 2001::1
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful subnet 2001::0/64 domain-search dastarikov.net
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful subnet 2001::0/64 address-range start 2001::100 stop 2001::199
+      dastarikov@dastarikov-gw-01# commit
+      dastarikov@dastarikov-gw-01# save
+    \end{minted}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image15.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{15}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image16.png}
+  \captionof{figure}{Проверка настроек сети.}
+  \label{16}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image18.png}
+  \captionof{figure}{Проверка настроек сети.}
+  \label{18}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.6\textwidth]{../images/image19.png}
+  \captionof{figure}{Получение адреса по DHCPv6.}
+  \label{19}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image21.png}
+  \captionof{figure}{Просмотр настроек сети.}
+  \label{21}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image22.png}
+  \captionof{figure}{Отправка эхо-запроса DHCP-серверу.}
+  \label{22}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image23.png}
+  \captionof{figure}{Проверка настроек DNS.}
+  \label{23}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image24.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{24}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Настройка DHCP в случае IPv6}
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image27.png}
+  \captionof{figure}{Перехваченный DHCPv6 пакет.}
+  \label{27}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Выводы}
+\begin{itemize}
+    \item В результате выполнения лабораторной работы получили навыки настройки службы DHCP на сетевом оборудовании для распределения адресов IPv4 и IPv6
+\end{itemize}
+\end{frame}
+\end{document}

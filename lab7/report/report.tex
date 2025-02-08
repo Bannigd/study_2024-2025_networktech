@@ -1,0 +1,421 @@
+\input{preamble.tex}
+
+\title{Отчет по лабораторной работе № 7. \\ Адресация IPv4 и IPv6. Настройка DHCP}
+\author{Данила Стариков \\ НПИбд-02-22}
+\date{2024}
+
+\begin{document}
+
+\maketitle
+\newpage
+\tableofcontents
+
+\newpage
+\section{Цель работы}
+Получение навыков настройки службы DHCP на сетевом оборудовании для распределения адресов IPv4 и IPv6.
+\newpage
+
+\subsection{Настройка DHCP в случае IPv4}
+\subsubsection{Постановка задачи}
+Задана топология сети (рис. \ref{img:topology1}) и сведения по адресному пространству сети (табл. \ref{tbl1}). Требуется настроить на маршрутизаторе, имеющим адрес 10.0.0.1, DHCP-сервис по распределению IPv4-адресов из диапазона 10.0.0.2 - 10.0.0.253, настроить получение адреса по DHCP на узле (PC), а также исследовать пакеты DHCP.
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image01.png}
+  \captionof{figure}{Топология моделируемой сети.}
+  \label{img:topology1}
+\end{center}
+
+\begin{table}[h]
+  \centering
+  \caption{Таблица адресации.}
+  \label{tbl1}
+  \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|}
+    \hline
+    Устройство & Интерфейс & IPv4-адрес               & Длина префикса & Шлюз по умолчанию & DNS             \\ \hline
+    gw-01      & eth0      & 10.0.0.1                 & 24             & -                 & -               \\ \hline
+    PC1        & NIC       & Назначен протоколом DHCP & 24 (DHCP)      & 10.0.0.1 (DHCP)   & 10.0.0.1 (DHCP) \\ \hline
+  \end{tabular}
+\end{table}
+\subsubsection{Выполнение работы}
+\begin{enumerate}
+\item Запустили GNS3 VM и GNS3. Создали новый проект.
+\item В рабочем пространстве разместили и соединили устройства в соответствии с топологией, приведённой на рис. \ref{img:topology1}. Использовали маршрутизатор VyOS и хост (клиент) VPCS.
+\item Изменили отображаемые названия устройств. Коммутаторам присвоили названия по принципу \texttt{dastarikov-sw-0x}, маршрутизаторам — по принципу \texttt{dastarikov-gw-0x}, VPCS — по принципу \texttt{PCx-dastarikov}, вместо x — порядковый номер устройства.
+\item Включили захват трафика на соединении между коммутатором \texttt{sw-01} и маршрутизатором \texttt{gw-01}.
+\item Настроили образ VyOS (для входа в систему использовали логин vyos и пароль vyos):
+  \begin{itemize}
+
+  \item На маршрутизаторах перешли в режим конфигурирования, изменили имя устройства и доменное имя, заменили системного пользователя, заданного по умолчанию, на пользователя dastarikov, пароль - 123456 (рис. \ref{02} и \ref{03}):
+    \begin{minted}{bash}
+      vyos@vyos$ configure
+      vyos@vyos# set system host-name dastarikov-gw-01
+      vyos@vyos# set system domain-name dastarikov.net
+      vyos@vyos# set system login user <dastarikov> authentication plaintext-password <mysecurepassword>
+      vyos@vyos# commit
+      vyos@vyos# save
+      vyos@vyos# exit
+      vyos@vyos$ exit
+      dastarikov-gw-01 login: dastarikov
+      Password:
+      dastarikov@dastarikov-gw-01:~$ configure
+      dastarikov@dastarikov-gw-01# delete system login user vyos
+      dastarikov@dastarikov-gw-01# commit
+      dastarikov@dastarikov-gw-01# save
+    \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image02.png}
+  \captionof{figure}{Настройка маршрутизатора.}
+  \label{02}
+\end{center}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image03.png}
+  \captionof{figure}{Настройка маршрутизатора.}
+  \label{03}
+\end{center}
+
+  \end{itemize}
+\item На маршрутизаторе под созданным пользователем перешли в режим конфигурирования и настроили адресацию IPv4:
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01# set interfaces ethernet eth0 address 10.0.0.1/24
+  \end{minted}
+
+\item Добавили конфигурацию DHCP-сервера на маршрутизаторе:
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov domain-name dastarikov.net
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov name-server 10.0.0.1
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov subnet 10.0.0.0/24 default-router 10.0.0.1
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov subnet 10.0.0.0/24 range hosts start 10.0.0.2
+    dastarikov@dastarikov-gw-01# set service dhcp-server shared-network-name dastarikov subnet 10.0.0.0/24 range hosts stop 10.0.0.253
+    dastarikov@dastarikov-gw-01# commit
+    dastarikov@dastarikov-gw-01# save
+    dastarikov@dastarikov-gw-01# exit
+  \end{minted}
+
+\item Для просмотра статистики DHCP-сервера и выданных адресов использовали команды (рис. \ref{04}):
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01$ show dhcp server statistics
+    dastarikov@dastarikov-gw-01$ show dhcp server leases
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image04.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{04}
+\end{center}
+
+\item Настроили оконечное устройство PC1 (рис. \ref{30} и \ref{31}):
+  \begin{minted}{bash}
+    PC1-dastarikov> ip dhcp -d
+    PC1-dastarikov> save
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image30.png}
+  \captionof{figure}{Настройка DHCP на PC1.}
+  \label{30}
+\end{center}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image31.png}
+  \captionof{figure}{Настройка DHCP на PC1.}
+  \label{31}
+\end{center}
+
+\item Проверили конфигурацию IPv4 на узле, пропингуйте маршрутизатор (рис. \ref{05}):
+  \begin{minted}{bash}
+    PC1-dastarikov> show ip
+    PC1-dastarikov> ping 10.0.0.1 -c 2
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image05.png}
+  \captionof{figure}{Проверка IP-адреса на PC1.}
+  \label{05}
+\end{center}
+
+\item На маршрутизаторе вновь посмотрели статистику DHCP-сервера и выданные адреса (рис. \ref{06}):
+
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01$ show dhcp server statistics
+    dastarikov@dastarikov-gw-01$ show dhcp server leases
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image06.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{06}
+\end{center}
+
+\item На маршрутизаторе посмотрели журнал работы DHCP-сервера (рис. \ref{07}):
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01$ show log | grep dhcp
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image07.png}
+  \captionof{figure}{Просмотр логов работы DHCP-сервера.}
+  \label{07}
+\end{center}
+
+\item Проанализировали захваченные анализатором трафика пакеты, относящиеся к работе DHCP и назначению адреса устройству (рис. \ref{08}).
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image08.png}
+  \captionof{figure}{Просмотр перехваченных пакетов.}
+  \label{08}
+\end{center}
+
+Два запроса <<DHCP Discover>> и <<DHCP Offer>> указывают на процесс присвоения PC1 IP-адреса. PC1 отправил шировещательный запрос ко всем устройствам сети (Discover), и DHCP-сервер в ответ предложил устройству IP-адрес (Offer). Так устройство автоматически получило IP-адрес.
+\end{enumerate}
+
+\subsection{Настройка DHCP в случае IPv6}
+
+\subsubsection{Постановка задачи}
+Задана топология сети (рис. \ref{img:topology2}) и сведения по адресному пространству (табл. \ref{tbl2}):
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image29.png}
+  \captionof{figure}{Топология моделируемой сети.}
+  \label{img:topology2}
+\end{center}
+
+\begin{table}[]
+\centering
+\caption{Таблица адресации}
+\label{tab2}
+\begin{tabular}{|l|l|p{3cm}|l|p{3cm}|p{2cm}|}
+\hline
+Устройство & Интерфейс & IPv4-адрес                          & Длина префикса & Шлюз по умолчанию         & DNS              \\ \hline
+gw-01      & eth1      & 2000::1                             & 64             & —                         & —                \\ \hline
+gw-01      & eth2      & 2001::1                             & 64             & —                         & —                \\ \hline
+PC2        & NIC       & Назначен протоколом SLAAC           & 64 (SLAAC)     & Назначен протоколом SLAAC &                  \\ \hline
+PC2        & NIC       & Назначен протоколами SLAAC и DHCPv6 & 64             & Назначен маршрутизатором  & 2000::1 (DHCPv6) \\ \hline
+PC3        & NIC       & Назначен протоколом DHCPv6          & 64             & Назначен маршрутизатором  & 2001::1 (DHCPv6) \\ \hline
+\end{tabular}
+\end{table}
+Требуется:
+\begin{itemize}
+\item на интерфейсе марштрутизатора eth1 настроить DHCPv6 без отслеживания состояния;
+\item на интерфейсе марштрутизатора eth2 настроить DHCPv6 с учётом отслеживания состояния.
+\end{itemize}
+
+\subsubsection{Выполненение работы}
+\begin{enumerate}
+\item В предыдущем проекте в рабочем пространстве дополнили сеть, разместив и соединив устройства в соответствии с топологией, приведённой на рис. \ref{img:topology2}. Использовали хост (клиент) Kali Linux, поскольку клиент VPCS не поддерживает DHCPv6.
+\item Изменили отображаемые названия устройств. Коммутаторам присвоили названия по принципу \texttt{dastarikov-sw-0x}, маршрутизаторам — по принципу \texttt{dastarikov-gw-0x}, VPCS — по принципу \texttt{PCx-dastarikov}, а вместо x — порядковый номер устройства.
+\item Включили захват трафика на соединениях между маршрутизатором \texttt{gw-01} и коммутаторами \texttt{sw-02} и \texttt{sw-03}.
+\item Настроили адресацию IPv6 на маршрутизаторе (рис. \ref{09}):
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01:~$ configure
+    dastarikov@dastarikov-gw-01# set interfaces ethernet eth1 address 2000::1/64
+    dastarikov@dastarikov-gw-01# set interfaces ethernet eth2 address 2001::1/64
+    dastarikov@dastarikov-gw-01# show interfaces
+    dastarikov@dastarikov-gw-01# commit
+    dastarikov@dastarikov-gw-01# save
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image09.png}
+  \captionof{figure}{Настройка IPv6-адресов на маршрутизаторе.}
+  \label{09}
+\end{center}
+
+\item На маршрутизаторе настроили DHCPv6 без отслеживания состояния (DHCPv6 Stateless configuration):
+  \begin{itemize}
+  \item Настройка объявления о маршрутизаторах (Router Advertisements, RA) на интерфейсе eth1:
+    \begin{minted}{bash}
+      dastarikov@dastarikov-gw-01# set service router-advert interface eth1 prefix 2000::/64
+      dastarikov@dastarikov-gw-01# set service router-advert interface eth1 other-config-flag
+    \end{minted}
+    Опция other-config-flag означает, что для конфигурации не адресных параметров использует протокол с сохранением состояния.
+  \item Добавление конфигурации DHCP-сервера):
+    \begin{minted}{bash}
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateless
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateless subnet 2000::0/64
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateless common-options name-server 2000::1
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateless common-options domain-search dastarikov.net
+      dastarikov@dastarikov-gw-01# commit
+      dastarikov@dastarikov-gw-01# save
+      dastarikov@dastarikov-gw-01# run show configuration
+    \end{minted}
+    Здесь с помощью указанных выше команд создана разделяемая сеть (shared-network-name) с названием dastarikov, задана информация общих опций (common-options) для разделяемой сети. При этом подсеть (subnet) 2000::/64 не требуется настраивать, поскольку она не будет содержать полезной информации.
+  \end{itemize}
+\item На узле PC2 проверили настройки сети (рис. \ref{10}):
+  \begin{minted}{bash}
+    root@PC2-dastarikov:/# ifconfig
+    root@PC2-dastarikov:/# route -n -A inet6
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image10.png}
+  \captionof{figure}{Проверка настроек сети узла PC2.}
+  \label{10}
+\end{center}
+
+
+\item На узле PC2 пропинговали маршрутизатор (рис. \ref{12}):
+  \begin{minted}{bash}
+    root@PC2-dastarikov:/# ping 2000::1 -c 2
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image12.png}
+  \captionof{figure}{Проверка подключения к маршрутизатору PC2.}
+  \label{12}
+\end{center}
+
+\item На узле PC2 проверили настройки DNS (рис. \ref{13}):
+  \begin{minted}{bash}
+    root@PC2-dastarikov:/# cat /etc/resolv.conf
+  \end{minted}
+
+\item На узле PC2 получили адрес по DHCPv6 (рис. \ref{13}):
+  \begin{minted}{bash}
+    root@PC2-dastarikov:/# dhclient -6 -S -v eth0
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image13.png}
+  \captionof{figure}{Проверка настроек DNS и DHCPv6 узла PC2.}
+  \label{13}
+\end{center}
+
+Здесь опция -6 указывает на использование протокола DHCPv6, опция -S — на запрос только информации DHCPv6, но не адреса, опция -v — на вывод на экран подробной информации.
+\item Вновь пропинговали от узла PC2 маршрутизатор, проверьте настройки DNS:
+\item На маршрутизаторе посмотрели статистику DHCP-сервера и выданные адреса (рис. \ref{14})
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01# run show dhcpv6 server leases
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image14.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{14}
+\end{center}
+
+\item В отчёте пояснили выведенную на маршрутизаторе и PC2 информацию, а также проанализировали захваченные анализатором трафика пакеты, относящиеся к работе DHCPv6 и назначению адреса устройству (рис. \ref{28}).
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image28.png}
+  \captionof{figure}{Перехваченный DHCPv6 пакет.}
+  \label{28}
+\end{center}
+
+Так как используется DHCPv6 без отслеживания состояния, то в пакете нет информации об IPv6 адресе узла PC, потому что не происходит выделения конкрентного адреса узлу, что также приводит к отсутствию записи в статистике DHCP-сервера.
+
+\item На маршрутизаторе настроили DHCPv6 с отслеживанием состояния (DHCPv6 Stateful configuration):
+  \begin{itemize}
+  \item На интерфейсе \texttt{eth2} маршрутизатора настроили объявления о маршрутизаторах (Router Advertisements, RA):
+    \begin{minted}{bash}
+      dastarikov@dastarikov-gw-01# set service router-advert interface eth2 managed-flag
+    \end{minted}
+    Опция \texttt{managed-flag} означает, что хосты использует администрируемый (отслеживающий состояние) протокол для автоматической настройки адресов в дополнение к любым адресам, автоматически настраиваемым с помощью SLAAC.
+  \item Добавили конфигурацию DHCP-сервера на маршрутизаторе (вместо dastarikov укажите имя вашей учётной записи):
+    \begin{minted}{bash}
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful subnet 2001::0/64
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful subnet 2001::0/64 name-server 2001::1
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful subnet 2001::0/64 domain-search dastarikov.net
+      dastarikov@dastarikov-gw-01# set service dhcpv6-server shared-network-name dastarikov-stateful subnet 2001::0/64 address-range start 2001::100 stop 2001::199
+      dastarikov@dastarikov-gw-01# commit
+      dastarikov@dastarikov-gw-01# save
+    \end{minted}
+    Здесь при помощи указанных выше команд создана разделяемая сеть (shared-network-name) с названием dastarikov, подсеть (subnet) с адресом 2001::/64, задан диапазон адресов (range) с именем hosts, содержащий адреса 2001::100 – 2001::199.
+  \end{itemize}
+\item На маршрутизаторе посмотрели статистику DHCP-сервера и выданные адреса (рис. \ref{15}):
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01# run show dhcpv6 server leases
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image15.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{15}
+\end{center}
+
+\item Подключились к узлу PC3 и проверили настройки сети (рис. \ref{16} и \ref{18}):
+  \begin{minted}{bash}
+    root@PC3-dastarikov:/# ifconfig
+    root@PC3-dastarikov:/# route -n -A inet6
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image16.png}
+  \captionof{figure}{Проверка настроек сети.}
+  \label{16}
+\end{center}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image18.png}
+  \captionof{figure}{Проверка настроек сети.}
+  \label{18}
+\end{center}
+
+\item На узле PC3 проверили настройки DNS:
+  \begin{minted}{bash}
+    root@PC3-dastarikov:/# cat /etc/resolv.conf
+  \end{minted}
+\item На узле PC3 получили адрес по DHCPv6 (рис. \ref{19}):
+  \begin{minted}{bash}
+    root@PC3-dastarikov:/# dhclient -6 -v eth0
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image19.png}
+  \captionof{figure}{Получение адреса по DHCPv6.}
+  \label{19}
+\end{center}
+\item Вновь на узле PC3 проверили настройки сети, пропинговали маршрутизатор, проверили настройки DNS (рис. \ref{21}-\ref{23}):
+  \begin{minted}{bash}
+    root@PC3-dastarikov:/# ifconfig
+    root@PC3-dastarikov:/# route -n -A inet6
+    root@PC3-dastarikov:/# ping 2001::1 -c 2
+    root@PC3-dastarikov:/# cat /etc/resolv.conf
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image21.png}
+  \captionof{figure}{Просмотр настроек сети.}
+  \label{21}
+\end{center}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image22.png}
+  \captionof{figure}{Отправка эхо-запроса DHCP-серверу.}
+  \label{22}
+\end{center}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image23.png}
+  \captionof{figure}{Проверка настроек DNS.}
+  \label{23}
+\end{center}
+
+\item На маршрутизаторе посмотрели статистику DHCP-сервера и выданные адреса (рис. \ref{24}):
+  \begin{minted}{bash}
+    dastarikov@dastarikov-gw-01# run show dhcpv6 server leases
+  \end{minted}
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image24.png}
+  \captionof{figure}{Просмотр статистики DHCP-сервера.}
+  \label{24}
+\end{center}
+
+\item Проанализировали захваченные анализатором трафика пакеты, относящиеся к работе DHCPv6 и назначению адреса устройству (рис. \ref{27}).
+
+\begin{center}
+  \includegraphics[width=0.8\textwidth]{../images/image27.png}
+  \captionof{figure}{Перехваченный DHCPv6 пакет.}
+  \label{27}
+\end{center}
+
+Так как используется DHCPv6 с отслеживанием состояния, то в пакете содержится информация об IPv6 адресе узла PC3.
+
+\end{enumerate}
+
+\section{Выводы}
+В результате выполнения лабораторной работы получили навыки настройки службы DHCP на сетевом оборудовании для распределения адресов IPv4 и IPv6.
+\end{document}
